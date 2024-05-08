@@ -36,3 +36,28 @@ if (isset($_POST['them_dh'])) {
     echo "<h3>Them DH thanh cong</h3>";
   }
 }
+
+if (isset($_GET["madh"])) {
+  // Lấy mã đơn hàng từ yêu cầu Ajax
+  $madh = $_GET['madh'];
+
+  // Truy vấn cơ sở dữ liệu để lấy danh sách sản phẩm
+  $query = "SELECT *
+  FROM SANPHAM SP
+  JOIN CHITIETDONHANG CT ON SP.MaSP = CT.MaSP
+  WHERE CT.MaDH = '$madh'
+  ";
+
+  $result = mysqli_query($con, $query);
+
+  // Tạo mảng để lưu trữ dữ liệu sản phẩm
+  $products = array();
+
+  // Lặp qua kết quả và đẩy vào mảng
+  while ($row = $result->fetch_assoc()) {
+    $products[] = $row;
+  }
+
+  // Trả về dữ liệu dạng JSON
+  echo json_encode($products);
+}

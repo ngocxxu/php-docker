@@ -9,6 +9,7 @@ require 'index.php';
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Liet ke don hang</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <style>
@@ -40,7 +41,7 @@ require 'index.php';
     <button type="button" name="lietke_dh" id='lietke_dh' class="btn btn-primary">Liet ke</button>
   </form></br>
 
-  <table">
+  <table>
     <thead>
       <tr>
         <th>Ma SP</th>
@@ -52,46 +53,50 @@ require 'index.php';
       </tr>
     </thead>
 
-    <tbody>
-    </tbody>
-    </table>
+    <tbody></tbody>
+  </table>
 
-    <script>
-      $(document).ready(function() {
-        $("#lietke_dh").click(function() {
-          const madh = $("#madh").val();
+  <script>
+    $(document).ready(function() {
+      $("#lietke_dh").click(function() {
+        const madh = $("#madh").val();
+        $.ajax({
+          url: "code.php",
+          type: "GET",
+          data: {
+            madh: madh
+          },
+          success: function(response) {
+            const dsSP = JSON.parse(response);
+            const tableBody = $("tbody");
+            tableBody.empty();
 
-          $.ajax({
-            url: "get_products.php",
-            type: "GET",
-            data: {
-              madh: madh
-            },
-            success: function(response) {
-              var products = JSON.parse(response);
-              var tableBody = $("tbody");
-              tableBody.empty();
+            for (const i = 0; i < dsSP.length; i++) {
+              const sp = dsSP[i];
 
-              for (var i = 0; i < products.length; i++) {
-                var product = products[i];
-                var row = '<tr>' +
-                  '<td>' + product.MaDH + '</td>' +
-                  '<td>' + product.name + '</td>' +
-                  '<td><img src="' + product.image + '" alt="' + product.name + '" width="50"></td>' +
-                  '<td>' + product.quantity + '</td>' +
-                  '<td>' + product.price + '</td>' +
-                  '<td><button class="delete">Delete</button> <button class="view">View</button></td>' +
-                  '</tr>';
-                tableBody.append(row);
-              }
-            },
-            error: function() {
-              alert("Đã xảy ra lỗi khi lấy danh sách sản phẩm.");
+              const row = `
+                <tr>
+                  <td>${sp.MaSP}</td>
+                  <td>${sp.TenSP}</td>
+                  <td>
+                    <img src="${sp.HinhAnh}" alt="${sp.HinhAnh}" width="50">
+                  </td>
+                  <td>${sp.SoLuong}</td>
+                  <td>${sp.GiaBan}</td>
+                  <td>
+                    <button id="delete">Delete</button>
+                    <button id="view">View</button>
+                  </td>
+                </tr>
+                `
+
+              tableBody.append(row);
             }
-          });
+          },
         });
       });
-    </script>
+    });
+  </script>
 </body>
 
 </html>

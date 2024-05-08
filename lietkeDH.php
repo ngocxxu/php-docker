@@ -26,19 +26,21 @@ require 'index.php';
     <label for="madh">Ma don hang:</label>
     <select name="madh" id="madh">
       <?php
-      $query = "SELECT * FROM DONHANG";
-      $query_run = mysqli_query($con, $query);
 
-      if (mysqli_num_rows($query_run) > 0) {
-        foreach ($query_run as $item) {
+      $sql = "SELECT * FROM DONHANG";
+      $query = mysqli_query($con, $sql);
+
+      if (mysqli_num_rows($query) > 0) {
+        foreach ($query as $item) {
       ?>
           <option value="<?= $item['MaDH']; ?>"><?= $item['MaDH']; ?></option>
       <?php
         }
       }
+
       ?>
     </select>
-    <button type="button" name="lietke_dh" id='lietke_dh' class="btn btn-primary">Liet ke</button>
+    <button type="button" name="lietke_dh" id='lietke_dh'>Liet ke</button>
   </form></br>
 
   <table>
@@ -70,12 +72,11 @@ require 'index.php';
             const dsSP = JSON.parse(response);
             const tableBody = $("tbody");
             tableBody.empty();
-
-            for (const i = 0; i < dsSP.length; i++) {
+            for (let i = 0; i < dsSP.length; i++) {
               const sp = dsSP[i];
 
               const row = `
-                <tr>
+                <tr data-masp="${sp.MaSP}">
                   <td>${sp.MaSP}</td>
                   <td>${sp.TenSP}</td>
                   <td>
@@ -84,8 +85,8 @@ require 'index.php';
                   <td>${sp.SoLuong}</td>
                   <td>${sp.GiaBan}</td>
                   <td>
-                    <button id="delete">Delete</button>
-                    <button id="view">View</button>
+                    <button type="submit" id="delete">Delete</button>
+                    <a href="updateSP.php?masp=${sp.MaSP}">View</a>
                   </td>
                 </tr>
                 `
@@ -95,6 +96,27 @@ require 'index.php';
           },
         });
       });
+
+
+      // Gắn sự kiện click cho các nút "Delete"
+      $("tbody").on("click", "#delete", function() {
+        const row = $(this).closest('tr');
+        const masp = row.data('masp');
+
+        $.ajax({
+          url: "code.php",
+          type: "POST",
+          data: {
+            _method: "DELETE",
+            masp: masp
+          },
+          success: function(data, status) {
+            row.remove();
+            alert("Xóa thành công");
+          },
+        })
+      });
+
     });
   </script>
 </body>
